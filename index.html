@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda Reunión Sacramental — Barrio Burgos</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="agenda-wrap" id="main">
+
+    <div class="church-header">
+      <div class="church-icon">⛪</div>
+      <div class="church-title">La Iglesia de Jesucristo de los Santos de los Últimos Días</div>
+      <div class="agenda-subtitle">Agenda de Reunión Sacramental — Barrio Burgos</div>
+    </div>
+
+    <div class="meta-row">
+      <div class="meta-field">
+        <label for="barrio">Barrio:</label>
+        <input type="text" id="barrio" placeholder="Nombre del barrio" />
+      </div>
+      <div class="meta-field">
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" />
+      </div>
+      <div class="meta-field">
+        <label for="asistencia">Asistencia:</label>
+        <input type="number" id="asistencia" placeholder="Núm." class="input-short" />
+      </div>
+    </div>
+
+    <div class="timer-bar">
+      ⏱ Tiempo Total: <strong id="total-display">0 min</strong>
+    </div>
+
+    <!-- 1. Preludio y Apertura -->
+    <div class="section">
+      <div class="section-header">
+        <span><span class="num">1.</span> Preludio y Apertura</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <label>Preside:</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="field-row">
+          <label>Dirige:</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="field-row">
+          <label>Reconocemos entre nosotros a:</label>
+          <input type="text" placeholder="Hermanos(as) visitantes" />
+        </div>
+        <div class="script-text">
+          El Presidente <span class="blank"></span> quien preside esta reunión,
+          me ha solicitado a mí, el hermano <span class="blank"></span>, que dirija esta reunión.
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Anuncios -->
+    <div class="section">
+      <div class="section-header">
+        <span><span class="num">2.</span> Anuncios</span>
+      </div>
+      <div class="section-body">
+        <div class="dynamic-list" id="anuncios-list"></div>
+        <button class="add-btn" data-list="anuncios-list" data-placeholder="Anuncio">
+          + Agregar Anuncio
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Apertura -->
+    <div class="section">
+      <div class="section-header">
+        <span><span class="num">3.</span> Apertura</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <label>Himno No. y Título:</label>
+          <input type="text" placeholder="Ej: 22 — Alabadle" />
+        </div>
+        <div class="field-row">
+          <label>Dirige la Música:</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="field-row">
+          <label>Oración de Apertura:</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="field-row">
+          <label>Al Piano / Órgano:</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="timer-note">⏱ Incluido en bloque apertura (10 min fijos)</div>
+      </div>
+    </div>
+
+    <!-- 4. Asuntos -->
+    <div class="section">
+      <div class="section-header">
+        <span><span class="num">4.</span> Asuntos de Barrio y Estaca</span>
+      </div>
+      <div class="section-body">
+        <div class="check-row">
+          <input type="checkbox" id="chkEstaca" />
+          <label for="chkEstaca">Asuntos de Estaca</label>
+        </div>
+        <div id="estaca-block" class="hidden">
+          <div class="field-row mt-sm">
+            <label>Presentados por:</label>
+            <input type="text" placeholder="Nombre" />
+          </div>
+        </div>
+        <hr class="divider" />
+        <div class="check-row">
+          <input type="checkbox" id="chkRelevos" />
+          <label for="chkRelevos">Relevos</label>
+        </div>
+        <div class="dynamic-list" id="relevos-list"></div>
+        <button class="add-btn" data-list="relevos-list" data-placeholder="Relevo">
+          + Agregar Relevo
+        </button>
+        <hr class="divider" />
+        <div class="check-row">
+          <input type="checkbox" id="chkSost" />
+          <label for="chkSost">Sostenimientos</label>
+        </div>
+        <div class="dynamic-list" id="sost-list"></div>
+        <button class="add-btn" data-list="sost-list" data-placeholder="Sostenimiento">
+          + Agregar Sostenimiento
+        </button>
+      </div>
+    </div>
+
+    <!-- 5. Santa Cena -->
+    <div class="section">
+      <div class="section-header">
+        <span><span class="num">5.</span> Himno Sacramental y Administración de la Santa Cena</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <label>Himno Sacramental:</label>
+          <input type="text" placeholder="No. y Título" />
+        </div>
+        <div class="field-row">
+          <label>Bendice:</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="field-row">
+          <label>Reparte:</label>
+          <input type="text" placeholder="Nombres" />
+        </div>
+        <div class="script-text">
+          Queremos expresar nuestro agradecimiento a los Hermanos que nos ayudaron con la
+          administración de la Santa Cena y los invitamos a sentarse con la congregación.
+          Ahora pasaremos al tiempo de los mensajes.
+        </div>
+        <div class="timer-note">⏱ Ítems 1–5 (Apertura + Santa Cena) = <strong>15 min fijos</strong></div>
+      </div>
+    </div>
+
+    <!-- 6. Programa Principal -->
+    <div class="section">
+      <div class="section-header">
+        <span><span class="num">6.</span> Programa Principal</span>
+      </div>
+      <div class="section-body">
+        <div class="dynamic-list" id="prog-list"></div>
+        <button class="add-btn" id="add-prog-btn">+ Agregar Elemento</button>
+      </div>
+    </div>
+
+    <!-- 7. Cierre -->
+    <div class="section">
+      <div class="section-header">
+        <span><span class="num">7.</span> Cierre</span>
+      </div>
+      <div class="section-body">
+        <div class="script-text">
+          Queremos expresar nuestro agradecimiento a los Hermanos que nos ayudaron con los mensajes, Música y apertura.
+        </div>
+        <div class="field-row">
+          <label>Para finalizar escucharemos al Hermano(a):</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="tiempo-btns" id="tiempo-btns">
+          <button class="tiempo-btn" data-min="3">3 min</button>
+          <button class="tiempo-btn" data-min="5">5 min</button>
+          <button class="tiempo-btn" data-min="7">7 min</button>
+          <button class="tiempo-btn" data-min="10">10 min</button>
+          <button class="tiempo-btn" data-min="15">15 min</button>
+          <button class="tiempo-btn" data-min="20">20 min</button>
+        </div>
+        <div id="tiempo-selected" class="timer-note"></div>
+        <div class="field-row">
+          <label>Último Himno No. y Título:</label>
+          <input type="text" placeholder="Ej: 54 — Amor de hogar" />
+        </div>
+        <div class="field-row">
+          <label>Dirige la Música:</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="field-row">
+          <label>La Última Oración será ofrecida por:</label>
+          <input type="text" placeholder="Nombre" />
+        </div>
+        <div class="timer-note">⏱ Último Himno + Despedida + Última Oración = <strong>5 min fijos</strong></div>
+        <div class="script-text">
+          Al finalizar esta reunión Sacramental, les invitamos a que nos acompañen a
+          aprender del Evangelio de Jesucristo en nuestras clases de Escuela Dominical.
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <button class="footer-btn" id="btn-print">🖨️ Imprimir</button>
+      <button class="footer-btn" id="btn-pdf">📄 Exportar PDF</button>
+      <button class="footer-btn" id="btn-blank">📋 Agenda en Blanco</button>
+    </div>
+
+    <div class="scripture">
+      "Haced todas las cosas con orden y decencia ante Dios." — D&C 20:68
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

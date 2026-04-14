@@ -1,0 +1,430 @@
+/* ===== Reset & Base ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f7f6f3;
+  --color-bg-tertiary: #f0efe9;
+  --color-text: #1a1a18;
+  --color-text-secondary: #5f5e5a;
+  --color-text-muted: #888780;
+  --color-border: rgba(0,0,0,0.12);
+  --color-border-medium: rgba(0,0,0,0.22);
+  --color-accent: #185fa5;
+  --color-accent-light: #e6f1fb;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1c1c1a;
+    --color-bg-secondary: #252522;
+    --color-bg-tertiary: #2c2c2a;
+    --color-text: #f0efe9;
+    --color-text-secondary: #b4b2a9;
+    --color-text-muted: #888780;
+    --color-border: rgba(255,255,255,0.1);
+    --color-border-medium: rgba(255,255,255,0.18);
+    --color-accent: #5ba3e8;
+    --color-accent-light: #0c2a44;
+  }
+}
+
+body {
+  font-family: var(--font);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+/* ===== Layout ===== */
+.agenda-wrap {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+.church-header {
+  text-align: center;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 0.5px solid var(--color-border);
+}
+
+.church-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.church-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.agenda-subtitle {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* ===== Meta Row ===== */
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.meta-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 170px;
+}
+
+.meta-field label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* ===== Timer Bar ===== */
+.timer-bar {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 0.5px solid var(--color-border);
+}
+
+.timer-bar strong {
+  color: var(--color-text);
+}
+
+/* ===== Sections ===== */
+.section {
+  background: var(--color-bg);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.section-header {
+  background: var(--color-bg-secondary);
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-bottom: 0.5px solid var(--color-border);
+}
+
+.section-header .num {
+  color: var(--color-text-muted);
+  margin-right: 4px;
+}
+
+.section-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ===== Fields ===== */
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.field-row label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select {
+  width: 100%;
+  font-size: 14px;
+  padding: 6px 10px;
+  border: 0.5px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font);
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(24, 95, 165, 0.12);
+}
+
+.input-short {
+  max-width: 90px;
+}
+
+/* ===== Script Text ===== */
+.script-text {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  line-height: 1.65;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+.blank {
+  border-bottom: 1px solid var(--color-border-medium);
+  display: inline-block;
+  min-width: 110px;
+  height: 13px;
+  vertical-align: bottom;
+  margin: 0 2px;
+}
+
+/* ===== Timer Notes ===== */
+.timer-note {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ===== Dynamic Lists ===== */
+.dynamic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dyn-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dyn-item input {
+  flex: 1;
+}
+
+.dyn-item.prog-item {
+  display: grid;
+  grid-template-columns: 1fr 130px 30px;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ===== Buttons ===== */
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-accent);
+  background: none;
+  border: 0.5px dashed var(--color-border-medium);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.15s;
+}
+
+.add-btn:hover {
+  background: var(--color-accent-light);
+}
+
+.del-btn {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.del-btn:hover {
+  color: #a32d2d;
+}
+
+/* ===== Checkboxes ===== */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.check-row input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+/* ===== Divider ===== */
+.divider {
+  border: none;
+  border-top: 0.5px solid var(--color-border);
+  margin: 2px 0;
+}
+
+/* ===== Tiempo Buttons ===== */
+.tiempo-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tiempo-btn {
+  font-size: 13px;
+  padding: 5px 14px;
+  border: 0.5px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.tiempo-btn:hover {
+  background: var(--color-bg-secondary);
+}
+
+.tiempo-btn.active {
+  background: var(--color-accent-light);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+/* ===== Footer Actions ===== */
+.footer-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.footer-btn {
+  font-size: 13px;
+  padding: 9px 20px;
+  border: 0.5px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: var(--font);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+
+.footer-btn:hover {
+  background: var(--color-bg-secondary);
+}
+
+/* ===== Scripture ===== */
+.scripture {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding-bottom: 2rem;
+}
+
+/* ===== Utilities ===== */
+.hidden {
+  display: none;
+}
+
+.mt-sm {
+  margin-top: 6px;
+}
+
+/* ===== Print Styles ===== */
+@media print {
+  body {
+    background: white;
+    padding: 0;
+  }
+
+  .agenda-wrap {
+    max-width: 100%;
+  }
+
+  .add-btn,
+  .del-btn,
+  .footer-actions,
+  .tiempo-btns {
+    display: none !important;
+  }
+
+  .section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ccc;
+  }
+
+  input,
+  select {
+    border: none;
+    border-bottom: 1px solid #aaa;
+    border-radius: 0;
+    padding: 2px 4px;
+    background: transparent !important;
+  }
+
+  .script-text {
+    background: #f5f5f2 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .section-header {
+    background: #f0efe9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
