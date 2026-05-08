@@ -240,13 +240,21 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px r
     size: Letter portrait;
     margin: 10mm 10mm 10mm 10mm;
   }
-  body > .agenda-wrap,
-  .saved-panel,
-  .fab-saved {
-    display: none !important;
+  /* Ocultar TODO excepto el resumen */
+  body * {
+    visibility: hidden;
+  }
+  /* Mostrar solo #print-view y sus hijos */
+  #print-view,
+  #print-view * {
+    visibility: visible;
   }
   #print-view {
     display: block !important;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    background: white;
   }
 }
 

@@ -733,7 +733,10 @@ function imprimirUnaPage() {
 
   const pv = document.getElementById('print-view');
   pv.innerHTML = html;
-  window.print();
+  // Esperar dos frames para que el browser renderice el #print-view antes de imprimir
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    window.print();
+  }));
 }
 
 /* ════════════════════════════════════════════════════
