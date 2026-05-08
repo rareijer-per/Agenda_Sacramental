@@ -234,6 +234,7 @@
     <button class="footer-btn" id="btn-print">🖨️ Imprimir / PDF</button>
     <button class="footer-btn" id="btn-docx">📝 Exportar .docx</button>
     <button class="footer-btn" id="btn-save">💾 Guardar borrador</button>
+    <button class="footer-btn" id="btn-save-named">📌 Guardar como agenda</button>
     <button class="footer-btn" id="btn-blank">📋 Agenda en Blanco</button>
   </div>
 
@@ -244,6 +245,28 @@
   </div>
 
 </div>
+
+<!-- ════ PANEL: Agendas Guardadas ════ -->
+<div class="saved-panel print-hide" id="saved-panel">
+  <div class="saved-panel-inner">
+    <div class="saved-header">
+      <span>📚 Agendas Guardadas</span>
+      <button class="saved-close" id="btn-close-saved">✕</button>
+    </div>
+    <div class="saved-body" id="saved-body">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ════ FAB: abrir agendas guardadas ════ -->
+<button class="fab-saved print-hide" id="btn-open-saved" title="Ver agendas guardadas">
+  📚
+  <span class="fab-badge hidden" id="saved-badge">0</span>
+</button>
+
+<!-- Vista resumida para impresión (generada por JS en imprimirUnaPage) -->
+<div id="print-view"></div>
 
 <!-- docx.js para generación de Word en el browser -->
 <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>

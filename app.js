@@ -63,6 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-save').addEventListener('click',  () => guardarEnCache(true));
   document.getElementById('btn-blank').addEventListener('click', limpiarAgenda);
 
+document.getElementById('btn-save-named').addEventListener('click', guardarComoAgenda);
+  document.getElementById('btn-open-saved').addEventListener('click', abrirPanelGuardadas);
+  document.getElementById('btn-close-saved').addEventListener('click', cerrarPanelGuardadas);
+  document.getElementById('saved-panel').addEventListener('click', e => {
+    if (e.target === document.getElementById('saved-panel')) cerrarPanelGuardadas();
+  });
+
+  actualizarBadgeGuardadas();
   calcTotal();
 });
 
@@ -597,25 +605,280 @@ function renderTimerSegments(ap, sc, prog, ci, total) {
 }
 
 /* ════════════════════════════════════════════════════
-   IMPRIMIR (fit-to-page)
+   IMPRIMIR — Vista resumida en una sola página
    ════════════════════════════════════════════════════ */
 function imprimirUnaPage() {
-  const MM    = 3.7795275591;
-  const wrap  = document.getElementById('main');
-  wrap.style.transform = wrap.style.transformOrigin = wrap.style.width = '';
-  const scale = Math.min((277 * MM) / wrap.scrollHeight, (195 * MM) / wrap.scrollWidth, 1);
-  if (scale < 1) {
-    wrap.style.transformOrigin = 'top left';
-    wrap.style.transform       = 'scale(' + scale + ')';
-    wrap.style.width           = (100 / scale) + '%';
+  const getVal = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const esc    = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  // Fecha legible
+  const fechaVal = getVal('fecha');
+  let fechaFmt = fechaVal;
+  try {
+    fechaFmt = new Date(fechaVal + 'T12:00:00').toLocaleDateString('es-MX',
+      { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    fechaFmt = fechaFmt.charAt(0).toUpperCase() + fechaFmt.slice(1);
+  } catch(_) {}
+
+  // Helpers de HTML
+  const pvRow = (label, val) =>
+    `<div class="pv-row"><span class="pv-label">${esc(label)}:</span><span class="pv-dash"></span><span class="pv-val">${esc(val||'—')}</span></div>`;
+
+  const pvBlock = (title, bodyHtml, full = false) =>
+    `<div class="pv-block ${full?'pv-col-full':''}">
+       <div class="pv-block-title">${esc(title)}</div>
+       <div class="pv-block-body">${bodyHtml}</div>
+     </div>`;
+
+  const listVals = listId => Array.from(
+    document.querySelectorAll('#'+listId+' input[type="text"]')
+  ).map(i=>i.value.trim()).filter(Boolean);
+
+  const pvBullets = items => items.length
+    ? `<ul class="pv-bullets">${items.map(v=>`<li>${esc(v)}</li>`).join('')}</ul>`
+    : '<span style="font-size:8pt;color:#888">—</span>';
+
+  // Campos estáticos por sección (misma posición que en el HTML)
+  const secInputs = (sectionIndex) =>
+    Array.from(document.querySelectorAll(`.section:nth-of-type(${sectionIndex}) .section-body input[type="text"]`));
+
+  const [preside, dirige, visitas] = secInputs(1).map(e=>e.value.trim());
+  const [himnoApert, dirigeMus1, oracionApert, piano] = secInputs(3).map(e=>e.value.trim());
+  const [himnoCena, bendice, reparte] = secInputs(5).map(e=>e.value.trim());
+  const cierreSec = Array.from(document.querySelectorAll('.section:nth-of-type(7) .section-body input[type="text"]'))
+    .filter(el=>el.id!=='hermano-cierre').map(e=>e.value.trim());
+  const [himnoFinal, dirigeMus2, oracionFinal] = cierreSec;
+
+  // Programa principal
+  const progItems = Array.from(document.querySelectorAll('#prog-list .prog-item')).map(item=>({
+    nombre: item.querySelectorAll('input')[0]?.value || '',
+    tipo:   item.querySelectorAll('select')[0]?.value || '',
+    min:    item.querySelectorAll('select')[1]?.value || '',
+    inicio: item.querySelector('.inicio-cell')?.textContent || '',
+    fin:    item.querySelector('.fin-cell')?.textContent || '',
+  }));
+
+  const tablaProgHTML = progItems.length
+    ? `<table class="pv-table">
+        <tr><th>Nombre / Tema</th><th>Tipo</th><th>Min</th><th>Inicio</th><th>Fin</th></tr>
+        ${progItems.map(p=>`<tr>
+          <td>${esc(p.nombre)}</td><td>${esc(p.tipo)}</td>
+          <td style="text-align:center">${esc(p.min)}'</td>
+          <td style="text-align:center">${esc(p.inicio)}</td>
+          <td style="text-align:center">${esc(p.fin)}</td>
+        </tr>`).join('')}
+       </table>`
+    : '<span style="font-size:8pt;color:#888">Sin elementos</span>';
+
+  // Asuntos (solo los activos)
+  let asuntosHTML = '';
+  if (document.getElementById('chkEstaca').checked) {
+    const pres = document.querySelector('#estaca-block input')?.value.trim()||'';
+    asuntosHTML += pvRow('Asuntos de Estaca — Presentados por', pres);
   }
+  if (document.getElementById('chkRelevos').checked) {
+    const rels = listVals('relevos-list');
+    asuntosHTML += `<div class="pv-label" style="margin-bottom:1pt">Relevos:</div>${pvBullets(rels)}`;
+  }
+  if (document.getElementById('chkSost').checked) {
+    const sosts = listVals('sost-list');
+    asuntosHTML += `<div class="pv-label" style="margin-top:3pt;margin-bottom:1pt">Sostenimientos:</div>${pvBullets(sosts)}`;
+  }
+  if (!asuntosHTML) asuntosHTML = '<span style="font-size:8pt;color:#888">Sin asuntos esta semana</span>';
+
+  // Anuncios
+  const anuncios = listVals('anuncios-list');
+
+  // Cierre
+  const hernanoCierre = getVal('hermano-cierre');
+  let cierreHTML = '';
+  cierreHTML += pvRow('Para finalizar escucharemos al Hno.(a)', hernanoCierre);
+  if (tiempoFinalMin) cierreHTML += pvRow('Tiempo asignado', tiempoFinalMin + ' min');
+  cierreHTML += pvRow('Último Himno', himnoFinal);
+  cierreHTML += pvRow('Dirige la Música', dirigeMus2);
+  cierreHTML += pvRow('Oración Final', oracionFinal);
+
+  // Construir HTML final
+  const html = `
+    <div class="pv-header">
+      <div class="pv-church">La Iglesia de Jesucristo de los Santos de los Últimos Días</div>
+      <div class="pv-title">⛪ Agenda de Reunión Sacramental</div>
+      <div class="pv-meta">Estaca Cuernavaca &nbsp;·&nbsp; Barrio: <strong>${esc(getVal('barrio')||'—')}</strong> &nbsp;·&nbsp; ${esc(fechaFmt)} &nbsp;·&nbsp; Asistencia: <strong>${esc(getVal('asistencia')||'—')}</strong></div>
+    </div>
+
+    <div class="pv-grid">
+      ${pvBlock('1. Preludio y Apertura',
+        pvRow('Preside', preside) + pvRow('Dirige', dirige) + pvRow('Visitantes', visitas)
+      )}
+      ${pvBlock('3. Himno de Apertura y Oración',
+        pvRow('Himno No. y Título', himnoApert) + pvRow('Dirige la Música', dirigeMus1) +
+        pvRow('Oración de Apertura', oracionApert) + pvRow('Al Piano / Órgano', piano)
+      )}
+      ${pvBlock('2. Anuncios',
+        pvBullets(anuncios)
+      )}
+      ${pvBlock('4. Asuntos de Barrio y Estaca',
+        asuntosHTML
+      )}
+      ${pvBlock('5. Himno Sacramental y Santa Cena',
+        pvRow('Himno Sacramental', himnoCena) + pvRow('Bendice', bendice) + pvRow('Reparte', reparte) +
+        `<div class="pv-script">Queremos expresar nuestro agradecimiento a los Hermanos que nos ayudaron con la administración de la Santa Cena.</div>`
+      )}
+      ${pvBlock('7. Cierre', cierreHTML)}
+      ${pvBlock('6. Programa Principal', tablaProgHTML, true)}
+    </div>
+
+    <div class="pv-footer">"Haced todas las cosas con orden y decencia ante Dios." — D&amp;C 20:68</div>
+  `;
+
+  const pv = document.getElementById('print-view');
+  pv.innerHTML = html;
   window.print();
-  setTimeout(() => { wrap.style.transform = wrap.style.transformOrigin = wrap.style.width = ''; }, 1500);
 }
 
 /* ════════════════════════════════════════════════════
-   LIMPIAR AGENDA
+   AGENDAS GUARDADAS — múltiples registros
    ════════════════════════════════════════════════════ */
+const SAVED_KEY = 'agenda_estaca_saved_v1';
+
+function listarGuardadas() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
+  } catch(_) { return []; }
+}
+
+function persistirGuardadas(lista) {
+  localStorage.setItem(SAVED_KEY, JSON.stringify(lista));
+}
+
+function guardarComoAgenda() {
+  const barrio = document.getElementById('barrio').value.trim() || 'Sin barrio';
+  const fecha  = document.getElementById('fecha').value || new Date().toISOString().split('T')[0];
+  const nombre = barrio + ' — ' + fecha;
+  const estado = recopilarEstado();
+  estado.nombre = nombre;
+
+  const lista = listarGuardadas();
+  // Verificar si ya existe una para ese mismo barrio+fecha
+  const existente = lista.findIndex(a => a.nombre === nombre);
+  if (existente >= 0) {
+    if (!confirm('Ya existe una agenda guardada para "' + nombre + '".\n¿Deseas sobreescribirla?')) return;
+    lista[existente] = estado;
+  } else {
+    lista.unshift(estado);            // más reciente primero
+    if (lista.length > 30) lista.pop(); // máximo 30 agendas
+  }
+
+  persistirGuardadas(lista);
+  actualizarBadgeGuardadas();
+  mostrarEstadoCache('📌 Agenda guardada: ' + nombre, 4000);
+}
+
+function cargarAgendaGuardada(nombre) {
+  const lista = listarGuardadas();
+  const estado = lista.find(a => a.nombre === nombre);
+  if (!estado) return;
+
+  if (!confirm('¿Cargar la agenda "' + nombre + '"?\nLos datos actuales sin guardar se perderán.')) return;
+  cerrarPanelGuardadas();
+
+  // Limpiar primero
+  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(i => i.value = '');
+  document.getElementById('fecha').valueAsDate = new Date();
+  ['anuncios-list','relevos-list','sost-list','prog-list'].forEach(id => {
+    document.getElementById(id).innerHTML = '';
+  });
+  ['chkEstaca','chkRelevos','chkSost'].forEach(id => { document.getElementById(id).checked = false; });
+  document.getElementById('estaca-block').classList.add('hidden');
+  tiempoFinalMin = 0;
+  document.getElementById('tiempo-selected').textContent = '';
+  document.querySelectorAll('.tiempo-btn').forEach(b => b.classList.remove('active'));
+
+  // Cargar datos
+  Object.entries(estado.campos || {}).forEach(([id, val]) => {
+    const el = document.getElementById(id); if (el) el.value = val;
+  });
+  Object.entries(estado.checks || {}).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) { el.checked = val; if (id==='chkEstaca') document.getElementById('estaca-block').classList.toggle('hidden',!val); }
+  });
+  Object.entries(estado.listas || {}).forEach(([listId, valores]) => {
+    const btn = document.querySelector('.add-btn[data-list="'+listId+'"]');
+    const ph  = btn ? btn.dataset.placeholder : 'Ítem';
+    valores.forEach(val => {
+      addSimpleItem(listId, ph);
+      const items = document.querySelectorAll('#'+listId+' input[type="text"]');
+      if (items.length) items[items.length-1].value = val;
+    });
+  });
+  (estado.programa || []).forEach(p => {
+    addProgItem();
+    const items = document.querySelectorAll('#prog-list .prog-item');
+    const last  = items[items.length-1];
+    if (!last) return;
+    const inputs  = last.querySelectorAll('input');
+    const selects = last.querySelectorAll('select');
+    if (inputs[0])  inputs[0].value  = p.nombre;
+    if (selects[0]) selects[0].value = p.tipo;
+    if (selects[1]) selects[1].value = p.min;
+  });
+  tiempoFinalMin = estado.tiempoFinalMin || 0;
+  if (tiempoFinalMin > 0) {
+    const btn = document.querySelector('.tiempo-btn[data-min="'+tiempoFinalMin+'"]');
+    if (btn) btn.classList.add('active');
+    document.getElementById('tiempo-selected').textContent = '⏱ '+tiempoFinalMin+' min para el mensaje de cierre';
+  }
+  calcTotal();
+  mostrarEstadoCache('📂 Agenda cargada: ' + nombre, 4000);
+}
+
+function eliminarAgendaGuardada(nombre) {
+  if (!confirm('¿Eliminar la agenda "' + nombre + '"? Esta acción no se puede deshacer.')) return;
+  const lista = listarGuardadas().filter(a => a.nombre !== nombre);
+  persistirGuardadas(lista);
+  actualizarBadgeGuardadas();
+  renderPanelGuardadas();
+}
+
+function actualizarBadgeGuardadas() {
+  const n = listarGuardadas().length;
+  const badge = document.getElementById('saved-badge');
+  badge.textContent = n;
+  badge.classList.toggle('hidden', n === 0);
+}
+
+function renderPanelGuardadas() {
+  const lista = listarGuardadas();
+  const body  = document.getElementById('saved-body');
+  if (!lista.length) {
+    body.innerHTML = '<div class="saved-empty">📭 No tienes agendas guardadas todavía.<br><small>Usa "Guardar como agenda" para guardar múltiples versiones.</small></div>';
+    return;
+  }
+  body.innerHTML = lista.map(a => {
+    const ts = a.timestamp ? new Date(a.timestamp).toLocaleString('es-MX') : '';
+    const barrio = a.campos?.barrio || '';
+    const fecha  = a.campos?.fecha  || '';
+    return `<div class="saved-item">
+      <div class="saved-item-info">
+        <div class="saved-item-title">${a.nombre || 'Agenda sin nombre'}</div>
+        <div class="saved-item-meta">${ts ? 'Guardada: ' + ts : ''}</div>
+      </div>
+      <div class="saved-item-actions">
+        <button class="saved-load-btn" onclick="cargarAgendaGuardada(${JSON.stringify(a.nombre)})">Cargar</button>
+        <button class="saved-del-btn"  onclick="eliminarAgendaGuardada(${JSON.stringify(a.nombre)})">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirPanelGuardadas() {
+  renderPanelGuardadas();
+  document.getElementById('saved-panel').classList.add('open');
+}
+
+function cerrarPanelGuardadas() {
+  document.getElementById('saved-panel').classList.remove('open');
+}
 function limpiarAgenda() {
   if (!confirm('¿Limpiar todos los campos y empezar desde cero?\n(El borrador guardado también se borrará)')) return;
   document.querySelectorAll('input[type="text"], input[type="number"]').forEach(i => i.value = '');
